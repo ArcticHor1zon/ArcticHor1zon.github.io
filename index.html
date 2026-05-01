@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects | MD3 Hub</title>
+    <style>
+        :root {
+            --primary: #9cd67d;
+            --surface: #10140f;
+            --on-surface: #e2e3dd;
+            --card-bg: rgba(22, 28, 21, 0.7);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Google Sans', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hub-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+            padding: 3rem 2rem;
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            opacity: 0.5;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: 2.5rem;
+        }
+        .project-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .project-link {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            color: var(--on-surface);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            text-align: left;
+        }
+        .project-link:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .project-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+        .project-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .project-path {
+            font-size: 0.7rem;
+            opacity: 0.4;
+            font-family: 'Roboto Mono', monospace;
+            margin-top: 0.2rem;
+        }
+        .loader {
+            margin: 2rem auto;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .footer {
+            margin-top: 3rem;
+            opacity: 0.25;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+        @media (min-width: 500px) {
+            .project-grid { grid-template-columns: 1fr 1fr; }
+            h1 { font-size: 3.8rem; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="hub-card">
+        <h1>My Projects</h1>
+        <div class="subtitle">Explore my work</div>
+
+        <div id="projectsContainer">
+            <div class="loader"></div>
+            <p style="opacity:0.5">Loading projects…</p>
+        </div>
+
+        <div class="footer">MD3 Hub · GitHub Pages</div>
+    </div>
+
+    <script>
+        (async function() {
+            const container = document.getElementById('projectsContainer');
+
+            // Simple name → path mapping (fallback)
+            const defaultProjects = {
+                "Temperament Test": "temperament/est.html",
+                "Quiz App": "quiz/index.html",
+                "Dashboard": "dashboard/index.html"
+            };
+
+            // Auto‑assign icons based on keywords in the name
+            function pickIcon(name) {
+                const lower = name.toLowerCase();
+                if (lower.includes('quiz') || lower.includes('test')) return '🧪';
+                if (lower.includes('gallery') || lower.includes('photo')) return '🖼️';
+                if (lower.includes('blog')) return '📝';
+                if (lower.includes('dashboard') || lower.includes('admin')) return '📊';
+                if (lower.includes('game')) return '🎮';
+                return '📄';
+            }
+
+            async function fetchProjects() {
+                try {
+                    const response = await fetch('./projects.json');
+                    if (!response.ok) throw new Error('Network response not ok');
+                    const data = await response.json();
+
+                    // NEW simple format: { "Name": "path", ... }
+                    if (typeof data === 'object' && !Array.isArray(data) && !data.projects) {
+                        const projects = [];
+                        for (const [name, path] of Object.entries(data)) {
+                            if (typeof path === 'string') {
+                                projects.push({ name, path, icon: pickIcon(name) });
+                            }
+                        }
+                        return projects;
+                    }
+
+                    // Legacy format: { "projects": [ { "name":..., "path":..., "icon":... }, ... ] }
+                    if (data.projects && Array.isArray(data.projects)) {
+                        return data.projects.map(p => ({
+                            name: p.name || 'Untitled',
+                            path: p.path || '#',
+                            icon: p.icon || pickIcon(p.name || '')
+                        }));
+                    }
+                    throw new Error('Unknown JSON structure');
+                } catch (error) {
+                    console.warn('Could not load projects.json, using default list:', error);
+                    return null;
+                }
+            }
+
+            function renderProjects(projects) {
+                if (!projects || projects.length === 0) {
+                    container.innerHTML = `<p style="opacity:0.5">No projects found. Add them to <code>projects.json</code>.</p>`;
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.className = 'project-grid';
+
+                projects.forEach(project => {
+                    const link = document.createElement('a');
+                    link.href = project.path;
+                    link.className = 'project-link';
+                    link.innerHTML = `
+                        <div class="project-icon">${project.icon}</div>
+                        <div>
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-path">${project.path}</div>
+                        </div>
+                    `;
+                    grid.appendChild(link);
+                });
+
+                container.innerHTML = '';
+                container.appendChild(grid);
+            }
+
+            const jsonProjects = await fetchProjects();
+            const projectsToShow = jsonProjects || Object.entries(defaultProjects).map(([name, path]) => ({
+                name, path, icon: pickIcon(name)
+            }));
+            renderProjects(projectsToShow);
+        })();
+    </script>
+</body>
+</html>
