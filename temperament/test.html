@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temperament Quiz</title>
+    <title>Temperament Quiz | MD3 Enhanced</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -573,11 +573,20 @@
                 <!-- Result Screen -->
                 <div id="resultScreen" class="hidden" role="region" aria-label="Quiz results">
                     <div class="text-center mb-8 sm:mb-10 fade-in">
-                        <div class="flex items-center justify-center gap-2 mb-4">
+                        <div class="flex items-center justify-center gap-2 mb-4 flex-wrap">
                             <span id="socialOrientation" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.25em] border border-white/20">...</span>
+                            <span id="secondaryBadge" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.25em] border border-white/20 hidden">Secondary: ...</span>
                         </div>
                         <h1 id="resultName" class="text-5xl sm:text-6xl font-bold mb-4 tracking-tighter">...</h1>
-                        <p id="resultDesc" class="opacity-60 text-base leading-relaxed max-w-sm mx-auto mb-10"></p>
+                        <p id="resultDesc" class="opacity-60 text-base leading-relaxed max-w-sm mx-auto mb-4"></p>
+                        <!-- Balance Score -->
+                        <div id="balanceSection" class="mt-4 hidden">
+                            <p class="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mb-2">Trait Balance</p>
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden max-w-[200px] mx-auto mb-1">
+                                <div id="balanceFill" class="h-full rounded-full transition-all duration-1000" style="width:0%; background:linear-gradient(90deg, var(--primary), #fff);"></div>
+                            </div>
+                            <p id="balanceLabel" class="text-xs opacity-60"></p>
+                        </div>
                     </div>
 
                     <div class="flex justify-center mb-10 sm:mb-12 overflow-visible fade-in" style="animation-delay: 0.2s" aria-hidden="true">
@@ -604,7 +613,12 @@
                         </svg>
                     </div>
 
-                    <div id="stats" class="space-y-5 sm:space-y-6 mb-10 sm:mb-12"></div>
+                    <div id="stats" class="space-y-5 sm:space-y-6 mb-6 sm:mb-8"></div>
+
+                    <!-- Insight Box -->
+                    <div id="insightBox" class="p-5 bg-white/5 rounded-2xl border border-white/10 mb-8 hidden fade-in text-sm leading-relaxed opacity-80">
+                        <p id="insightText"></p>
+                    </div>
 
                     <div class="pt-8 border-t border-white/10 mb-10 fade-in" style="animation-delay: 0.4s">
                         <p class="text-[9px] font-bold opacity-30 uppercase tracking-[0.4em] mb-5 text-center">Share this code</p>
@@ -681,6 +695,15 @@
                 phlegmatic: "The Steady Harbor. You are calm and kind. You help keep things peaceful and are a great listener."
             };
 
+            const INSIGHTS = {
+                'sanguine-choleric': "Your enthusiasm and drive make you a natural motivator. You thrive in fast-paced, social environments.",
+                'sanguine-melancholic': "You balance a lively spirit with deep reflection – a creative and empathetic blend.",
+                'sanguine-phlegmatic': "Your warmth and easygoing nature make you a beloved peacemaker.",
+                'choleric-melancholic': "A strategic thinker with high standards, you excel at turning complex ideas into reality.",
+                'choleric-phlegmatic': "You combine steady reliability with quiet determination, making you a calm but effective leader.",
+                'melancholic-phlegmatic': "Your sensitivity and patience create a thoughtful, supportive presence."
+            };
+
             const STORAGE_KEY = 'temperament-quiz-state-v2';
             const TOTAL_QUESTIONS = QUESTIONS.length;
             const MAX_SCORE_PER_TYPE = 50;
@@ -721,6 +744,12 @@
             const resultName = $('#resultName');
             const resultDesc = $('#resultDesc');
             const socialOrientation = $('#socialOrientation');
+            const secondaryBadge = $('#secondaryBadge');
+            const balanceSection = $('#balanceSection');
+            const balanceFill = $('#balanceFill');
+            const balanceLabel = $('#balanceLabel');
+            const insightBox = $('#insightBox');
+            const insightText = $('#insightText');
             const copyFeedback = $('#copyFeedback');
             const restoreError = $('#restoreError');
             const autoRestorePrompt = $('#autoRestorePrompt');
@@ -971,6 +1000,7 @@
 
                 const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
                 const primary = sorted[0][0];
+                const secondary = sorted[1][1] > 0 ? sorted[1][0] : null;
 
                 const totalExtro = scores.sanguine + scores.choleric;
                 const totalIntro = scores.melancholic + scores.phlegmatic;
@@ -984,6 +1014,32 @@
                 socialOrientation.innerText = orientation;
                 resultName.innerText = primary.charAt(0).toUpperCase() + primary.slice(1);
                 resultDesc.innerText = DESCRIPTIONS[primary];
+
+                // Secondary temperament badge
+                if (secondary) {
+                    secondaryBadge.innerText = `Secondary: ${secondary.charAt(0).toUpperCase()+secondary.slice(1)}`;
+                    secondaryBadge.classList.remove('hidden');
+                } else {
+                    secondaryBadge.classList.add('hidden');
+                }
+
+                // Balance score
+                const values = Object.values(scores);
+                const mean = values.reduce((a,b)=>a+b,0)/4;
+                const variance = values.reduce((s,v)=>s + (v-mean)**2, 0)/4;
+                const stdDev = Math.sqrt(variance);
+                const balancePercent = Math.max(0, Math.min(100, 100 - (stdDev / 15)*100));
+                balanceFill.style.width = balancePercent + '%';
+                balanceSection.classList.remove('hidden');
+                if (balancePercent > 75) balanceLabel.innerText = 'Very Balanced';
+                else if (balancePercent > 45) balanceLabel.innerText = 'Moderately Focused';
+                else balanceLabel.innerText = 'Highly Specialized';
+
+                // Insight
+                const key = [primary, secondary].filter(Boolean).sort().join('-');
+                const insight = INSIGHTS[key] || "Your unique blend of traits gives you a one‑of‑a‑kind perspective.";
+                insightText.innerText = insight;
+                insightBox.classList.remove('hidden');
 
                 setTimeout(() => {
                     animateRadarChart(scores);
