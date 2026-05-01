@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperament Quiz | MD3 Enhanced</title>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="flex items-center justify-center p-3 sm:p-4" role="application" aria-label="Temperament Quiz">
+
+    <div class="bg-container" aria-hidden="true">
+        <div id="shape1" class="m3-shape shape-1"></div>
+        <div id="shape2" class="m3-shape shape-2"></div>
+    </div>
+
+    <div class="max-w-xl w-full relative z-10">
+        <div id="mainContainer" class="m3-card p-6 sm:p-8 md:p-12 flex flex-col" role="main">
+
+            <!-- Quiz Header -->
+            <div id="quizHeader" class="hidden mb-8 sm:mb-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <button id="backBtn" class="back-button hidden" onclick="goBack()" aria-label="Go back to previous question" title="Previous question">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1.5 text-[10px] font-bold tracking-[0.2em] opacity-40 uppercase">
+                            <span id="stepCounter">Question 1 of 40</span>
+                            <span id="percentText" style="color: var(--primary)">0%</span>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div id="progressFill" class="h-full" style="width: 0%; background-color: var(--primary)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="contentArea">
+                <!-- Start Screen -->
+                <div id="startScreen" class="text-center fade-in" role="region" aria-label="Welcome screen">
+                    <div class="w-24 h-24 bg-white/5 rounded-[32px] flex items-center justify-center mx-auto mb-10 border border-white/10 shadow-inner fade-in-scale">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--primary)" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-5xl font-bold mb-4 tracking-tighter">Your Nature</h1>
+                    <p class="opacity-50 mb-12 text-sm leading-relaxed max-w-xs mx-auto">Discover how you naturally think and act through this simple quiz.</p>
+
+                    <button onclick="startQuiz()" class="m3-button-filled w-full mb-5 text-lg" aria-label="Start the temperament quiz">Start Quiz</button>
+
+                    <button onclick="toggleIdInput()" class="text-[10px] font-bold opacity-30 hover:opacity-100 transition-opacity uppercase tracking-[0.3em] bg-transparent border-none cursor-pointer text-inherit py-2 px-4 rounded-xl focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)]" aria-expanded="false" aria-controls="idInputSection">
+                        Load Results
+                    </button>
+
+                    <div id="idInputSection" class="hidden mt-6 space-y-3 fade-in" role="region" aria-label="Load previous results">
+                        <input type="text" id="restoreId" placeholder="Paste your code here..." aria-label="Result code input" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-white placeholder:text-white/30">
+                        <button onclick="restoreSession()" class="w-full bg-white/5 border border-white/10 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)]">Submit Code</button>
+                        <p id="restoreError" class="text-red-400 text-xs hidden mt-2"></p>
+                    </div>
+
+                    <!-- Auto-restore prompt -->
+                    <div id="autoRestorePrompt" class="hidden mt-6 p-4 bg-white/5 rounded-2xl border border-white/10 fade-in">
+                        <p class="text-xs opacity-60 mb-3">You have an unfinished quiz. Continue?</p>
+                        <div class="flex gap-3">
+                            <button onclick="resumeQuiz()" class="flex-1 m3-button-filled text-sm py-3">Continue</button>
+                            <button onclick="clearSavedState()" class="flex-1 m3-button-outlined text-sm py-3">Start Fresh</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Screen -->
+                <div id="questionScreen" class="hidden" role="region" aria-live="polite" aria-label="Question">
+                    <h2 id="questionText" class="text-2xl sm:text-3xl font-medium mb-8 sm:mb-12 leading-tight tracking-tight">...</h2>
+                    <div class="grid gap-3 sm:gap-4" id="choiceContainer" role="radiogroup" aria-label="Answer choices">
+                        <button onclick="answer(5)" data-value="5" style="animation-delay: 0.05s" class="m3-choice stagger-item" role="radio" aria-checked="false">
+                            <span class="choice-number">1</span> Strongly Agree
+                        </button>
+                        <button onclick="answer(4)" data-value="4" style="animation-delay: 0.15s" class="m3-choice stagger-item" role="radio" aria-checked="false">
+                            <span class="choice-number">2</span> Agree
+                        </button>
+                        <button onclick="answer(3)" data-value="3" style="animation-delay: 0.25s" class="m3-choice stagger-item opacity-60" role="radio" aria-checked="false">
+                            <span class="choice-number">3</span> Not Sure
+                        </button>
+                        <button onclick="answer(2)" data-value="2" style="animation-delay: 0.35s" class="m3-choice stagger-item" role="radio" aria-checked="false">
+                            <span class="choice-number">4</span> Disagree
+                        </button>
+                        <button onclick="answer(1)" data-value="1" style="animation-delay: 0.45s" class="m3-choice stagger-item" role="radio" aria-checked="false">
+                            <span class="choice-number">5</span> Strongly Disagree
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transition Screen -->
+                <div id="transitionScreen" class="hidden text-center py-20 sm:py-24 fade-in" role="status" aria-live="assertive">
+                    <span class="m3-loader mb-10" aria-hidden="true"></span>
+                    <h2 class="text-2xl font-bold mb-3 tracking-tight">Analyzing Answers</h2>
+                    <p class="opacity-40 text-[10px] tracking-[0.4em] uppercase font-bold">Building your profile</p>
+                </div>
+
+                <!-- Result Screen -->
+                <div id="resultScreen" class="hidden" role="region" aria-label="Quiz results">
+                    <div class="text-center mb-8 sm:mb-10 fade-in">
+                        <div class="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                            <span id="socialOrientation" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.25em] border border-white/20">...</span>
+                            <span id="secondaryBadge" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.25em] border border-white/20 hidden">Secondary: ...</span>
+                        </div>
+                        <h1 id="resultName" class="text-5xl sm:text-6xl font-bold mb-4 tracking-tighter">...</h1>
+                        <p id="resultDesc" class="opacity-60 text-base leading-relaxed max-w-sm mx-auto mb-4"></p>
+                        <!-- Balance Score -->
+                        <div id="balanceSection" class="mt-4 hidden">
+                            <p class="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mb-2">Trait Balance</p>
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden max-w-[200px] mx-auto mb-1">
+                                <div id="balanceFill" class="h-full rounded-full transition-all duration-1000" style="width:0%; background:linear-gradient(90deg, var(--primary), #fff);"></div>
+                            </div>
+                            <p id="balanceLabel" class="text-xs opacity-60"></p>
+                        </div>
+                    </div>
+
+                    <!-- Radar Chart -->
+                    <div class="flex justify-center mb-10 sm:mb-12 overflow-visible fade-in" style="animation-delay: 0.2s" aria-hidden="true">
+                        <svg width="280" height="280" viewBox="-25 -25 250 250" class="overflow-visible max-w-full">
+                            <circle cx="100" cy="100" r="80" class="radar-grid" />
+                            <circle cx="100" cy="100" r="60" class="radar-grid" />
+                            <circle cx="100" cy="100" r="40" class="radar-grid" />
+                            <circle cx="100" cy="100" r="20" class="radar-grid" />
+                            <line x1="100" y1="20" x2="100" y2="180" class="radar-grid" />
+                            <line x1="20" y1="100" x2="180" y2="100" class="radar-grid" />
+                            <line x1="43.4" y1="43.4" x2="156.6" y2="156.6" class="radar-grid opacity-30" />
+                            <line x1="156.6" y1="43.4" x2="43.4" y2="156.6" class="radar-grid opacity-30" />
+
+                            <text x="100" y="0" text-anchor="middle" font-size="7" font-weight="700" fill="var(--outline)" class="tracking-widest">SANGUINE</text>
+                            <text x="195" y="103" text-anchor="start" font-size="7" font-weight="700" fill="var(--outline)" class="tracking-widest">CHOLERIC</text>
+                            <text x="100" y="210" text-anchor="middle" font-size="7" font-weight="700" fill="var(--outline)" class="tracking-widest">MELANCHOLIC</text>
+                            <text x="5" y="103" text-anchor="end" font-size="7" font-weight="700" fill="var(--outline)" class="tracking-widest">PHLEGMATIC</text>
+
+                            <polygon id="radarPoly" points="100,100 100,100 100,100 100,100" class="radar-poly" />
+                            <circle id="radarDot0" cx="100" cy="100" r="5" class="radar-dot" style="display:none;" />
+                            <circle id="radarDot1" cx="100" cy="100" r="5" class="radar-dot" style="display:none;" />
+                            <circle id="radarDot2" cx="100" cy="100" r="5" class="radar-dot" style="display:none;" />
+                            <circle id="radarDot3" cx="100" cy="100" r="5" class="radar-dot" style="display:none;" />
+                        </svg>
+                    </div>
+
+                    <!-- Trait Stats -->
+                    <div id="stats" class="space-y-5 sm:space-y-6 mb-6 sm:mb-8"></div>
+
+                    <!-- Insight Box -->
+                    <div id="insightBox" class="p-5 bg-white/5 rounded-2xl border border-white/10 mb-8 hidden fade-in text-sm leading-relaxed opacity-80">
+                        <p id="insightText"></p>
+                    </div>
+
+                    <!-- Share Code -->
+                    <div class="pt-8 border-t border-white/10 mb-10 fade-in" style="animation-delay: 0.4s">
+                        <p class="text-[9px] font-bold opacity-30 uppercase tracking-[0.4em] mb-5 text-center">Share this code</p>
+                        <div id="resultIdDisplay" class="id-badge" onclick="copyId()" tabindex="0" role="button" aria-label="Click to copy share code" title="Click to copy">...</div>
+                        <p class="text-[9px] text-center mt-3 opacity-0 transition-opacity duration-300" id="copyFeedback">Copied!</p>
+                    </div>
+
+                    <button onclick="resetQuiz()" class="w-full py-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-bold text-[10px] uppercase tracking-[0.3em] fade-in focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)]" style="animation-delay: 0.6s">Take Quiz Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JS -->
+    <script src="script.js"></script>
+</body>
+</html>
