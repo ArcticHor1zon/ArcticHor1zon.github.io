@@ -11,22 +11,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    :root {
-        --transition-speed: 0.1s;
-    }
-    .m3-shape {
-        animation: none !important;
-    }
-    .m3-choice,
-    .m3-button-filled,
-    #progressFill,
-    .radar-poly {
-        transition-duration: 0.1s !important;
-    }
-    .fade-in,
-    .stagger-in {
-        animation-duration: 0.1s !important;
-    }
+    :root { --transition-speed: 0.1s; }
+    .m3-shape { animation: none !important; }
+    .m3-choice, .m3-button-filled, #progressFill, .radar-poly { transition-duration: 0.1s !important; }
+    .fade-in, .stagger-in { animation-duration: 0.1s !important; }
 }
 
 body {
@@ -35,36 +23,22 @@ body {
     color: var(--on-surface);
     margin: 0;
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh;
-    width: 100vw;
-    width: 100dvw;
+    height: 100vh; height: 100dvh;
+    width: 100vw; width: 100dvw;
     transition: background-color var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, button, input, span, p {
-    font-family: 'Google Sans', sans-serif;
-}
+h1, h2, h3, button, input, span, p { font-family: 'Google Sans', sans-serif; }
 
-.bg-container {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
+.bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 
 .m3-shape {
-    position: absolute;
-    background-color: var(--theme-color);
-    filter: blur(80px);
-    opacity: var(--shape-opacity);
-    transition: all 2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 1.5s ease, opacity 1.5s ease;
-    animation: morph 18s infinite alternate ease-in-out;
-    will-change: transform, border-radius, background-color;
+    position: absolute; background-color: var(--theme-color); filter: blur(80px);
+    opacity: var(--shape-opacity); transition: all 2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 1.5s ease, opacity 1.5s ease;
+    animation: morph 18s infinite alternate ease-in-out; will-change: transform, border-radius, background-color;
 }
 
 @keyframes morph {
@@ -79,17 +53,12 @@ h1, h2, h3, button, input, span, p {
 .shape-2 { width: 70vw; height: 70vw; bottom: -30%; left: -15%; animation-delay: -6s; animation-duration: 20s; }
 
 .m3-card {
-    background-color: var(--card-bg);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--card-bg); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+    border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
-    max-height: 92vh; max-height: 92dvh;
-    overflow-y: auto; overflow-x: hidden;
+    max-height: 92vh; max-height: 92dvh; overflow-y: auto; overflow-x: hidden;
     transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), border-color 1.5s ease, box-shadow 1.5s ease;
-    scroll-behavior: smooth;
-    position: relative;
+    scroll-behavior: smooth; position: relative;
 }
 
 .m3-card::-webkit-scrollbar { width: 4px; }
@@ -98,37 +67,22 @@ h1, h2, h3, button, input, span, p {
 .m3-card::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
 .m3-button-filled {
-    background-color: var(--primary);
-    color: var(--on-primary);
-    border-radius: 20px;
-    padding: 18px 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    border: none;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    letter-spacing: -0.01em;
+    background-color: var(--primary); color: var(--on-primary); border-radius: 20px; padding: 18px 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 500; position: relative; overflow: hidden;
+    cursor: pointer; border: none; outline: none; user-select: none; -webkit-user-select: none; letter-spacing: -0.01em;
 }
 .m3-button-filled:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; border-radius: 22px; }
 .m3-button-filled:active { transform: scale(0.96); }
 .m3-button-filled::after {
-    content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
-    background: white; opacity: 0; transition: opacity 0.2s; pointer-events: none; border-radius: 20px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: white; opacity: 0;
+    transition: opacity 0.2s; pointer-events: none; border-radius: 20px;
 }
 .m3-button-filled:hover::after { opacity: 0.12; }
 .m3-button-filled:active::after { opacity: 0.2; }
 
 .m3-button-outlined {
-    background-color: transparent;
-    color: var(--on-surface);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 16px 20px;
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    background-color: transparent; color: var(--on-surface); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 16px 20px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
     font-weight: 500; cursor: pointer; outline: none; user-select: none; -webkit-user-select: none;
 }
 .m3-button-outlined:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; border-radius: 22px; }
@@ -136,22 +90,10 @@ h1, h2, h3, button, input, span, p {
 .m3-button-outlined:active { transform: scale(0.97); background-color: rgba(255,255,255,0.1); }
 
 .m3-choice {
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    cursor: pointer;
-    background-color: rgba(255,255,255,0.03);
-    position: relative;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    text-align: left;
-    padding: 18px 20px;
-    font-weight: 500;
-    color: var(--on-surface);
-    width: 100%;
-    font-family: 'Google Sans', sans-serif;
-    font-size: 0.95rem;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    cursor: pointer; background-color: rgba(255,255,255,0.03); position: relative; outline: none;
+    user-select: none; -webkit-user-select: none; text-align: left; padding: 18px 20px; font-weight: 500;
+    color: var(--on-surface); width: 100%; font-family: 'Google Sans', sans-serif; font-size: 0.95rem;
 }
 .m3-choice:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 22px; border-color: var(--primary); background-color: rgba(255,255,255,0.1); }
 .m3-choice:hover { background-color: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateX(4px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -166,10 +108,8 @@ h1, h2, h3, button, input, span, p {
 .m3-choice:hover .choice-number { background: var(--primary); color: var(--on-primary); }
 
 .m3-loader {
-    width: 56px; height: 56px;
-    border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary);
-    border-radius: 50%; display: inline-block;
-    animation: rotation 1.2s cubic-bezier(0.5,0,0.5,1) infinite;
+    width: 56px; height: 56px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary);
+    border-radius: 50%; display: inline-block; animation: rotation 1.2s cubic-bezier(0.5,0,0.5,1) infinite;
     box-shadow: 0 0 20px rgba(156,214,125,0.2);
 }
 @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -189,11 +129,10 @@ h1, h2, h3, button, input, span, p {
 .radar-dot { fill: var(--primary); filter: drop-shadow(0 0 4px var(--primary)); transition: all 1.2s cubic-bezier(0.34,1.56,0.64,1); }
 
 .id-badge {
-    font-family: 'Roboto Mono', monospace;
-    background: rgba(0,0,0,0.3); padding: 16px; border-radius: 20px;
-    border: 1px dashed rgba(255,255,255,0.15); cursor: pointer;
-    word-break: break-all; font-size: 0.7rem; line-height: 1.5; text-align: center;
-    color: var(--on-surface); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); letter-spacing: 0.03em;
+    font-family: 'Roboto Mono', monospace; background: rgba(0,0,0,0.3); padding: 16px; border-radius: 20px;
+    border: 1px dashed rgba(255,255,255,0.15); cursor: pointer; word-break: break-all;
+    font-size: 0.7rem; line-height: 1.5; text-align: center; color: var(--on-surface);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1); letter-spacing: 0.03em;
 }
 .id-badge:hover { background: rgba(255,255,255,0.06); border-color: var(--primary); border-style: solid; letter-spacing: 0.06em; box-shadow: 0 0 24px rgba(156,214,125,0.1); }
 .id-badge.copied { border-color: var(--primary); border-style: solid; background: rgba(156,214,125,0.08); animation: copyPulse 0.6s cubic-bezier(0.34,1.56,0.64,1); }
@@ -203,10 +142,9 @@ h1, h2, h3, button, input, span, p {
 .result-bar-fill { transition: width 1.5s cubic-bezier(0.65,0,0.35,1); border-radius: 999px; box-shadow: 0 0 8px currentColor; }
 
 .back-button {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);
-    color: var(--on-surface); cursor: pointer; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); outline: none; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); color: var(--on-surface);
+    cursor: pointer; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); outline: none; flex-shrink: 0;
 }
 .back-button:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); transform: translateX(-2px); }
 .back-button:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
