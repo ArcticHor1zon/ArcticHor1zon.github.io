@@ -105,6 +105,26 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .empty-state p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            opacity: 0.7;
+        }
+        .empty-state code {
+            background: rgba(255,255,255,0.05);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin: 0.3rem 0;
+        }
         .footer {
             margin-top: 3rem;
             opacity: 0.25;
@@ -136,14 +156,9 @@
         (async function() {
             const container = document.getElementById('projectsContainer');
 
-            // Simple name → path mapping (fallback)
-            const defaultProjects = {
-                "Temperament Test": "temperament/est.html",
-                "Quiz App": "quiz/index.html",
-                "Dashboard": "dashboard/index.html"
-            };
+            // Clean default – no demo entries.
+            const defaultProjects = {};
 
-            // Auto‑assign icons based on keywords in the name
             function pickIcon(name) {
                 const lower = name.toLowerCase();
                 if (lower.includes('quiz') || lower.includes('test')) return '🧪';
@@ -157,10 +172,10 @@
             async function fetchProjects() {
                 try {
                     const response = await fetch('./projects.json');
-                    if (!response.ok) throw new Error('Network response not ok');
+                    if (!response.ok) throw new Error('Not found');
                     const data = await response.json();
 
-                    // NEW simple format: { "Name": "path", ... }
+                    // Simple format: { "Name": "path" }
                     if (typeof data === 'object' && !Array.isArray(data) && !data.projects) {
                         const projects = [];
                         for (const [name, path] of Object.entries(data)) {
@@ -171,7 +186,7 @@
                         return projects;
                     }
 
-                    // Legacy format: { "projects": [ { "name":..., "path":..., "icon":... }, ... ] }
+                    // Legacy format: { "projects": [...] }
                     if (data.projects && Array.isArray(data.projects)) {
                         return data.projects.map(p => ({
                             name: p.name || 'Untitled',
@@ -181,14 +196,26 @@
                     }
                     throw new Error('Unknown JSON structure');
                 } catch (error) {
-                    console.warn('Could not load projects.json, using default list:', error);
-                    return null;
+                    console.info('No projects.json found – you can create one to list your projects.');
+                    return Object.entries(defaultProjects).map(([name, path]) => ({
+                        name, path, icon: pickIcon(name)
+                    }));
                 }
             }
 
             function renderProjects(projects) {
                 if (!projects || projects.length === 0) {
-                    container.innerHTML = `<p style="opacity:0.5">No projects found. Add them to <code>projects.json</code>.</p>`;
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <p>✨ No projects yet.</p>
+                            <p style="font-size:0.9rem;">Create a <code>projects.json</code> file next to this page:</p>
+                            <code style="font-size:0.75rem; white-space:pre-wrap;">{
+  "My Cool App": "cool-app/index.html",
+  "Temperament Quiz": "quiz/est.html"
+}</code>
+                            <p style="margin-top:1rem; font-size:0.8rem;">and refresh – they will appear here automatically.</p>
+                        </div>
+                    `;
                     return;
                 }
 
@@ -213,11 +240,8 @@
                 container.appendChild(grid);
             }
 
-            const jsonProjects = await fetchProjects();
-            const projectsToShow = jsonProjects || Object.entries(defaultProjects).map(([name, path]) => ({
-                name, path, icon: pickIcon(name)
-            }));
-            renderProjects(projectsToShow);
+            const projects = await fetchProjects();
+            renderProjects(projects);
         })();
     </script>
 </body>
