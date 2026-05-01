@@ -1,7 +1,4 @@
 (function() {
-    // ──────────────────────────────────────
-    // Constants
-    // ──────────────────────────────────────
     const QUESTIONS = [
         { type: 'sanguine', text: "I find it easy to talk to new people." },
         { type: 'sanguine', text: "I love being around lots of people." },
@@ -75,9 +72,6 @@
     const RADAR_CENTER = 100;
     const RADAR_RADIUS = 80;
 
-    // ──────────────────────────────────────
-    // State
-    // ──────────────────────────────────────
     let currentIdx = 0;
     let shuffled = [];
     let scores = { sanguine: 0, choleric: 0, melancholic: 0, phlegmatic: 0 };
@@ -85,9 +79,6 @@
     let quizCompleted = false;
     let isTransitioning = false;
 
-    // ──────────────────────────────────────
-    // DOM References
-    // ──────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
     const mainContainer = $('#mainContainer');
     const startScreen = $('#startScreen');
@@ -119,9 +110,6 @@
     const idInputSection = $('#idInputSection');
     const restoreIdInput = $('#restoreId');
 
-    // ──────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────
     function updateTheme(type) {
         const theme = THEMES[type] || THEMES.default;
         const root = document.documentElement.style;
@@ -136,9 +124,6 @@
         mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ──────────────────────────────────────
-    // State Persistence
-    // ──────────────────────────────────────
     function saveState() {
         if (quizCompleted) return localStorage.removeItem(STORAGE_KEY);
         try {
@@ -192,9 +177,6 @@
         showQuestion();
     }
 
-    // ──────────────────────────────────────
-    // Quiz Flow
-    // ──────────────────────────────────────
     function resetQuizInternal() {
         currentIdx = 0;
         scores = { sanguine: 0, choleric: 0, melancholic: 0, phlegmatic: 0 };
@@ -319,9 +301,6 @@
         setTimeout(showResult, 2800);
     }
 
-    // ──────────────────────────────────────
-    // Enhanced Result Display
-    // ──────────────────────────────────────
     function showResult() {
         transitionScreen.classList.add('hidden');
         resultScreen.classList.remove('hidden');
@@ -330,7 +309,6 @@
         const primary = sorted[0][0];
         const secondary = sorted[1][1] > 0 ? sorted[1][0] : null;
 
-        // Energy style
         const totalExtro = scores.sanguine + scores.choleric;
         const totalIntro = scores.melancholic + scores.phlegmatic;
         const maxPossible = MAX_SCORE_PER_TYPE * 2;
@@ -344,15 +322,11 @@
         resultName.innerText = primary.charAt(0).toUpperCase() + primary.slice(1);
         resultDesc.innerText = DESCRIPTIONS[primary];
 
-        // Secondary badge
-        if (secondary && sorted[1][1] > 0) {
+        if (secondary) {
             secondaryBadge.innerText = `Secondary: ${secondary.charAt(0).toUpperCase()+secondary.slice(1)}`;
             secondaryBadge.classList.remove('hidden');
-        } else {
-            secondaryBadge.classList.add('hidden');
-        }
+        } else secondaryBadge.classList.add('hidden');
 
-        // Balance score
         const values = Object.values(scores);
         const mean = values.reduce((a,b)=>a+b,0)/4;
         const variance = values.reduce((s,v)=>s + (v-mean)**2, 0)/4;
@@ -364,13 +338,11 @@
         else if (balancePercent > 45) balanceLabel.innerText = 'Moderately Focused';
         else balanceLabel.innerText = 'Highly Specialized';
 
-        // Insight
-        const key = [primary, secondary].sort().join('-');
+        const key = [primary, secondary].filter(Boolean).sort().join('-');
         const insight = INSIGHTS[key] || "Your unique blend of traits gives you a one‑of‑a‑kind perspective.";
         insightText.innerText = insight;
         insightBox.classList.remove('hidden');
 
-        // Radar and stats (same as before)
         setTimeout(() => animateRadarChart(scores), 400);
         const resId = btoa(JSON.stringify(scores)).replace(/=/g, '');
         resultIdDisplay.innerText = resId;
@@ -400,9 +372,6 @@
         quizCompleted = true;
     }
 
-    // ──────────────────────────────────────
-    // Radar Chart Animation (unchanged)
-    // ──────────────────────────────────────
     function animateRadarChart(targetScores) {
         const types = ['sanguine','choleric','melancholic','phlegmatic'];
         const targetPoints = types.map((t,i) => {
@@ -437,9 +406,6 @@
         requestAnimationFrame(frame);
     }
 
-    // ──────────────────────────────────────
-    // ID and Copy
-    // ──────────────────────────────────────
     function toggleIdInput() {
         const isHidden = idInputSection.classList.contains('hidden');
         if (isHidden) {
@@ -486,9 +452,6 @@
         }
     }
 
-    // ──────────────────────────────────────
-    // Keyboard support
-    // ──────────────────────────────────────
     document.addEventListener('keydown', e => {
         if (!questionScreen.classList.contains('hidden') && !isTransitioning && !quizCompleted) {
             const val = {'1':1,'2':2,'3':3,'4':4,'5':5}[e.key];
@@ -509,9 +472,6 @@
         }
     });
 
-    // ──────────────────────────────────────
-    // Global exposure
-    // ──────────────────────────────────────
     window.startQuiz = startQuiz;
     window.resetQuiz = resetQuiz;
     window.toggleIdInput = toggleIdInput;
@@ -522,7 +482,6 @@
     window.clearSavedState = clearSavedState;
     window.resumeQuiz = resumeQuiz;
 
-    // Auto-resume check
     const saved = loadState();
     if (saved && saved.currentIdx > 0 && saved.currentIdx < TOTAL_QUESTIONS) {
         autoRestorePrompt.classList.remove('hidden');
